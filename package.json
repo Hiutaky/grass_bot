@@ -2,15 +2,18 @@
   "name": "grass_bot",
   "version": "1.0.0",
   "type": "module",
-  "description": "Farm Grass on any VPS using NodeJS",
+  "description": "Farm Grass token on any VPS using NodeJS, Websockets and Proxies",
   "main": "index.js",
   "scripts": {
-    "start:proxy": "node src/with-proxy.js"
+    "start:proxy": "node src/with-proxy.js",
+    "start": "node src/without-proxy.js",
+    "prettier:fix": "prettier . --write "
   },
   "author": "hiutaky",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "prettier": "^3.3.3",
     "socks-proxy-agent": "^8.0.4",
     "uuid": "^11.0.2",
     "ws": "^8.18.0"

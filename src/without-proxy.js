@@ -8,10 +8,8 @@ env.config();
  * CONFIGS
  */
 const userId = process.env.USER_ID;
-const proxyList = process.env.PROXIES.split(";");
 
 console.log("UserId", userId);
-console.log("Proxy", proxyList);
 /**
  * DEFAULTS
  */
@@ -25,14 +23,8 @@ const intervalLoopsPerDeviceId = {};
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
-async function connectToWss(
-  socks5Proxy,
-  deviceId = uuidv3(socks5Proxy, uuidv3.DNS),
-) {
+async function connectToWss(deviceId = uuidv3(userId, uuidv3.DNS)) {
   console.log(`Device ID ${deviceId}`);
-
-  //configuring WS Socks5 Agent
-  const agent = new SocksProxyAgent(socks5Proxy);
 
   let websocket = false;
 
@@ -40,7 +32,6 @@ async function connectToWss(
     console.log("Try Connect Websocket");
     try {
       return new WebSocket(uri, {
-        agent,
         headers: customHeaders,
       });
     } catch (e) {
@@ -71,7 +62,7 @@ async function connectToWss(
       clearInterval(intervalLoopsPerDeviceId[deviceId]);
     websocket.terminate();
     //try reconnecting with same device id and proxy
-    connectToWss(socks5Proxy, deviceId);
+    connectToWss(deviceId);
   };
 
   websocket.on("error", (error) => {
@@ -122,7 +113,6 @@ async function connectToWss(
       //handle socket error
       websocket.on("error", (error) => {
         console.error(`WebSocket Error: ${error}`);
-        console.error(`Proxy: ${socks5Proxy}`);
 
         handleError("Error");
       });
@@ -138,11 +128,9 @@ async function connectToWss(
   }
 }
 
-function startWithProxy() {
-  if (!proxyList.length) throw "Please add at least a proxy in the .env file.";
+function start() {
   if (!userId) throw "Please provide a valid UserId in the .env file.";
-
-  proxyList.map((proxy) => connectToWss(proxy));
+  connectToWss();
 }
 
-startWithProxy();
+start();
